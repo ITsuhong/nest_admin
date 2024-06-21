@@ -1,19 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { User } from './entities/user.entity';
-import { Result } from '../../../common/dto/result.dto';
+import { Result } from '@/common/dto/result.dto';
 import { plainToInstance } from 'class-transformer';
 import { Role } from '../roles/entities/role.entity';
-import { getPagination } from '../../../common/utils/index.util';
+import { RoutesModule } from '../routes-module/entities/routes-module.entity';
+import { getPagination } from '@/common/utils/index.util';
 import { ListUserDto } from './dto/list-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import { getRoutesModule } from '@/common/utils/index.util';
 
 @Injectable()
 export class UserService {
   @InjectEntityManager()
   private readonly entityManager: EntityManager;
+  @Inject(JwtService)
+  private readonly jwtService: JwtService;
 
   async create(createUserDto: CreateUserDto) {
     try {
@@ -104,27 +109,27 @@ export class UserService {
   }
 
   async routesTree(user: User) {
+    const admin = await this.entityManager
+      .createQueryBuilder(User, 'user')
+      .where('user.id = :id', { id: user.id })
+      .addSelect('user.role')
+      .getOne();
+    if (admin.administrator === 1) {
+      const allRoutes = await this.entityManager.find(RoutesModule);
+      const result = getRoutesModule(allRoutes);
+      return new Result().ok({ data: result });
+    }
     const res = await this.entityManager
       .createQueryBuilder(User, 'user')
-      .where('user.id = :id', { id: 15 })
+      .where('user.id = :id', { id: user.id })
       .leftJoinAndSelect('user.role', 'roles')
       .leftJoinAndSelect('roles.routes', 'routes_module')
       .getOne();
-    // return;
+    if (!res.role?.routes) {
+      return new Result().ok({ data: [] });
+    }
     const allRoute = res.role.routes;
-    const result = [];
-    allRoute.forEach((item) => {
-      if (item.pid === 0) {
-        result.push({ ...item, children: [] });
-      }
-    });
-    result.forEach((item) => {
-      allRoute.forEach((i) => {
-        if (i.pid === item.id) {
-          item.children.push(i);
-        }
-      });
-    });
+    const result = getRoutesModule(allRoute);
     return new Result().ok({ data: result });
   }
 }

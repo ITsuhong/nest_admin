@@ -24,7 +24,10 @@ export class LoginService {
         .getOne();
       if (result === null) {
         return new Result().error({ message: '没有这个用户' });
-      } else if (!(await BcryptUtil.compare(data.password, result.password))) {
+      } else if (
+        // data.password !== result.password
+        !(await BcryptUtil.compare(data.password, result.password))
+      ) {
         return new Result().error({ message: '账号或密码不对' });
       } else {
         delete result.password;

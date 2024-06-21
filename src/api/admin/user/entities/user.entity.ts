@@ -23,6 +23,12 @@ export class User extends BaseEntity {
   })
   password: string;
 
+  @Column({
+    comment: '是否睡觉哦超级管理员',
+    default: 0,
+  })
+  administrator: number;
+
   @ManyToOne(() => Role, (role) => role.users, { onDelete: 'CASCADE' })
   role: Role;
 

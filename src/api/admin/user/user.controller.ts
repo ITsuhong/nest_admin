@@ -14,7 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDTO } from '../../../common/dto/pagination.dto';
 import { ListUserDto } from './dto/list-user.dto';
 
-// @UseGuards(LoginGuard)
+@UseGuards(LoginGuard)
 @Controller('/admin/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

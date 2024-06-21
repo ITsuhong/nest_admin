@@ -21,6 +21,7 @@ export class LoginGuard implements CanActivate {
     try {
       const info = this.jwtService.verify(token);
       (request as any).user = info.user;
+      request.user = info.user;
       return true;
     } catch (e) {
       throw new UnauthorizedException('登录 token 失效，请重新登录');

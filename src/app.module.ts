@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { RolesModule } from './api/admin/roles/roles.module';
 import { RoutesModuleModule } from './api/admin/routes-module/routes-module.module';
+import { AdministratorModule } from './api/admin/administrator/administrator.module';
 
 @Global()
 @Module({
@@ -25,6 +26,7 @@ import { RoutesModuleModule } from './api/admin/routes-module/routes-module.modu
     }),
     RolesModule,
     RoutesModuleModule,
+    AdministratorModule,
   ],
   controllers: [],
   providers: [],

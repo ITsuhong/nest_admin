@@ -22,3 +22,21 @@ export const getPagination = (data: {
     list: list,
   };
 };
+
+//返回树形菜单
+export const getRoutesModule = (routes: any) => {
+  const result = [];
+  routes.forEach((item) => {
+    if (item.pid === 0) {
+      result.push({ ...item, children: [] });
+    }
+  });
+  result.forEach((item) => {
+    routes.forEach((i) => {
+      if (i.pid === item.id) {
+        item.children.push(i);
+      }
+    });
+  });
+  return result;
+};
